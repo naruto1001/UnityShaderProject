@@ -1,4 +1,7 @@
-﻿Shader "Custom/BaseShader"
+﻿/*
+输出纯色的shader
+*/
+Shader "Custom/BaseShader"
 {
     SubShader {
         Pass {
