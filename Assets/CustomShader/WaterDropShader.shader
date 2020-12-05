@@ -38,15 +38,33 @@ Shader "Custom/WaterDropShader"
 
             fixed4 frag(v2f i) : SV_Target{
                 float4 col = 0;
+                float t = _Time.y;
 
                 float2 aspect = float2(2, 1);
                 float2 uv = i.uv * _Size * aspect;
+                //控制UV运动配合水滴下落
+                uv.y += t * 0.25;
                 float2 gv = frac(uv) - 0.5;
 
-                float drop = smoothstep(0.05, 0.01, length(gv / aspect));
+                float x = 0;
+                float y = -sin(t + sin(t + sin(t) * 0.5)) * 0.45;
+                float2 dropPos = (gv - float2(x, y)) / aspect; 
 
-                //col += drop;
-                col.rg = gv;
+                float drop = smoothstep(0.05, 0.03, length(dropPos));
+
+                float2 dropTrailPos = (gv - float2(x, 0)) / aspect;
+                dropTrailPos.y = (frac(dropTrailPos.y * 8) / 8)-0.03;
+                float dropTrail = smoothstep(0.03, 0.02, length(dropTrailPos));
+
+                dropTrail *= smoothstep(-0.05, 0.05, dropPos.y);
+                //dropTrail *= smoothstep(0.5, y, gv.y);
+
+                if(gv.x > 0.48 || gv.y > 0.48){
+                    return float4(1, 0, 0, 0);
+                }
+
+                col += drop;
+                col += dropTrail;
                 return col;
             }
 
